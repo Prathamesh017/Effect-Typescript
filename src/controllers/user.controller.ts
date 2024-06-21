@@ -1,7 +1,7 @@
 
 import {Task, User} from "../common/inteface.ts";
 import { Request, Response } from "express";
-import {createTaskService, createUserService,doesUserExist, getAllTasksService, updateTaskService } from "../services/user-service.ts";
+import {createTaskService, createUserService,deleteTaskService,doesUserExist, getAllTasksService, updateTaskService } from "../services/user-service.ts";
 import { Effect, Exit } from "effect";
 import { isUUID } from "../common/utitlies.ts";
 const users: User[] = [];
@@ -43,7 +43,7 @@ export function createTask(req:Request,res:Response){
     if(isUserExist){
       const task= Effect.runSync(createTaskService(user_id,req.body));
       tasks.push(task);
-      res.status(200).json({ status: "Success", message: "Task Created Successfull", data: task })
+      res.status(201).json({ status: "Success", message: "Task Created Successfull", data: task })
     }else{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
@@ -119,10 +119,45 @@ export function updateTask(req:Request,res:Response){
     }
     const isUserExist = Effect.runSync(doesUserExist("id",user_id, users));
     if(isUserExist){
-      const task= Effect.runSync(updateTaskService(task_id,user_id,req.body,tasks));
-      res.status(200).json({ status: "Success", message: "Task Updated Successfull", data: task })
+      const taskExit= Effect.runSyncExit(updateTaskService(task_id,user_id,req.body,tasks));
+      Exit.match(taskExit,{
+        onSuccess:(val)=>{
+          res.status(200).json({ status: "Success", message: "Task Updated Successfull", data: val})
+        },
+        onFailure:()=>{
+          res.status(400).json({ status: "failure", message: "Task Doesn't Exist" })
+        }
+      })
     }else{
-      res.status(400).json({ status: "failure", message: "Task Doesn't Exist" })
+      res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
+    }
+  }catch(err){
+    console.log(err)
+    res.status(400).json({ status: "Failure" })
+  }
+}
+
+
+export function deleteTask(req:Request,res:Response){
+  try{
+    const {user_id,task_id}=req.params;
+    if((!(isUUID(user_id))) || (!(isUUID(task_id)))){
+      res.status(400).json({status: "failure", message: "Invalid Id"})
+      return;
+    }
+    const isUserExist = Effect.runSync(doesUserExist("id",user_id, users));
+    if(isUserExist){
+      const taskExit= Effect.runSyncExit(deleteTaskService(task_id,user_id,tasks));
+      Exit.match(taskExit,{
+        onSuccess:()=>{
+          res.status(204).json({ status: "Success", message: "Task Deleted Successfull"})
+        },
+        onFailure:()=>{
+          res.status(400).json({ status: "failure", message: "Task Doesn't Exist" })
+        }
+      })
+    }else{
+      res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
   }catch(err){
     console.log(err)

@@ -1,5 +1,5 @@
 import { Effect, Exit } from "effect";
-import { createTaskService, createUserService, doesUserExist, getAllTasksService, updateTaskService } from "./user-service.ts";
+import { createTaskService, createUserService, deleteTaskService, doesUserExist, getAllTasksService, updateTaskService } from "./user-service.ts";
 import { Task, TaskStatus, User } from "../common/inteface.ts"
 import { createUser } from "../controllers/user.controller.ts";
 import { getUUIDPattern, isUUID } from "../common/utitlies.ts";
@@ -133,6 +133,28 @@ describe(("Task Service"), () => {
     }
     try {
       Effect.runSyncExit(updateTaskService(task_id,user_id,mockTask,tasks));
+     }
+     catch (err) {
+       (await chai).expect(err).to.be.an('error').with.property('message', "Task Doesn't Exist");
+     }
+  })
+
+
+  // ! Delete Task
+  it('should delete the task successfully',async()=>{
+    let length=tasks.length;
+    const task_id = 'task1';
+    const user_id = 'user1';
+    Effect.runSync(deleteTaskService(task_id,user_id,tasks));
+    (await chai).expect(tasks.length).to.be.equals(length-1);
+  })
+
+
+  it('should fail if given task to delete is  not found',async()=>{
+    const task_id = 'task4';
+    const user_id = 'user1';
+    try {
+      Effect.runSyncExit(deleteTaskService(task_id,user_id,tasks));
      }
      catch (err) {
        (await chai).expect(err).to.be.an('error').with.property('message', "Task Doesn't Exist");

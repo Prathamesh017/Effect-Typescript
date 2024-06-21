@@ -63,3 +63,12 @@ export const updateTaskService = (task_id:string,user_id: string,taskDetails:Tas
   tasks[toUpdatedIndex] = updatedTask;
   return Effect.succeed(updatedTask);
 };
+
+export const deleteTaskService=(task_id:string,user_id: string,tasks:Task[]): Effect.Effect<boolean, Error> => {
+  const toDeleteIndex=tasks.findIndex(task => task.user_id === user_id  && task_id===task.id);
+  if(toDeleteIndex === -1){
+    return Effect.fail(new Error("Task Doesn't Exist"));
+  }
+  tasks.splice(toDeleteIndex,1);
+  return Effect.succeed(true);
+};
