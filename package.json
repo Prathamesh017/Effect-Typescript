@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc",
-    "start": "nodemon -I --exec node --experimental-specifier-resolution=node  --loader ts-node/esm ./src/index.ts",
+    "dev": "nodemon -I --exec node --experimental-specifier-resolution=node  --loader ts-node/esm ./src/index.ts",
     "test": "ts-mocha src/controllers/**/*.test.ts src/services/**/*.test.ts"
   },
   "author": "Prathamesh Thakare",

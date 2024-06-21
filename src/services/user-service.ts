@@ -1,22 +1,35 @@
 import { Effect } from "effect";
-import { User } from "../common/inteface.ts";
+import { Task, TaskRequest, User } from "../common/inteface.ts";
 import { v4 as uuidv4 } from 'uuid';
 
-
-export const doesUserExist = (user_name: string, users: User[]): Effect.Effect<boolean, Error> => {
-  const isUser = users.some(user => user.user_name === user_name);
+type keyType=keyof User;
+export const doesUserExist = (key: keyType, value: User[keyType], users: User[]): Effect.Effect<boolean> => {
+  const isUser = users.some(user => user[key] === value);
   return Effect.sync(() => {
     if (isUser) {
-      throw new Error();
+      return true;
     }
     return false;
   })
 };
 
-export const createUserService = (user_name: string): Effect.Effect<User,never> => {
-  const user:User={
-    id:uuidv4(),
+export const createUserService = (user_name: string): Effect.Effect<User, never> => {
+  const user: User = {
+    id: uuidv4(),
     user_name
   }
   return Effect.succeed(user);
+};
+
+
+export const createTaskService = (user_id: string,taskDetails:TaskRequest): Effect.Effect<Task, never> => {
+  const task: Task = {
+    title:taskDetails.title,
+    status:taskDetails.status,
+    id:uuidv4(),
+    description:taskDetails.description,
+    dueDate:taskDetails.dueDate || Date.now(),
+    user_id,
+  }
+  return Effect.succeed(task);
 };

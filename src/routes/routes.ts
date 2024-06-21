@@ -1,11 +1,11 @@
 import express from 'express'
-import { createUser } from '../controllers/user.controller.ts';
+import { createTask, createUser } from '../controllers/user.controller.ts';
 
 
 
 const userRouter = express.Router()
 
-userRouter.post("/", createUser);
+userRouter.post("/", createUser).post("/:user_id/tasks",createTask);
 
 
 export default userRouter;

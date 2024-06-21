@@ -1,8 +1,12 @@
 import { describe, it} from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { createUser } from './user.controller.ts';
+import { createTask, createUser } from './user.controller.ts';
 import { Request, Response } from 'express';import { Effect } from 'effect';
+import { isUUID } from '../common/utitlies.ts';
+import { TaskStatus } from '../common/inteface.ts';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const mockResponse = () => {
   let res:any={} ;
@@ -10,14 +14,11 @@ const mockResponse = () => {
   res.json = sinon.stub().returns(res);
   return res;
 };
-const mockRequest=(body:any)=>({
+const mockRequest=(body:any,params:any=null)=>({
   body,
+  params,
 })
 
-function isUUID(value:string) {
-  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidPattern.test(value);
-}
 
 describe('User-Controller Test Cases', () => {
   it('create a new user successfully',() => {
@@ -40,3 +41,41 @@ describe('User-Controller Test Cases', () => {
     expect(res.json.calledOnceWithExactly({status: "failure", message: "User Already Exist"})).to.be.true;
   });
 });
+
+
+describe("Task Controller Test Cases",()=>{
+  const mockTask=
+  { 
+    "title":"Task 2",
+    "description":"DESKTOP APP",
+    "status":TaskStatus.INPROGRESS,
+    "dueDate":new Date(),
+  }
+  it('should return 400 if user_id is invalid', () => {
+    const user_id='invalid-uuid';
+    const req = mockRequest({mockTask},{user_id}) as Request;
+    const  res=mockResponse();
+    createTask(req as Request, res as Response);
+
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({ status: "failure", message: "Invalid User Id"})).to.be.true;
+   
+  });
+  it('should return 400 if required body data is missing', () => {
+    const user_id=uuidv4();
+    const req = mockRequest({title:"",description:"",status:""},{user_id}) as Request;
+    const  res=mockResponse();
+    createTask(req as Request, res as Response);
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({status: "failure", message: "Invalid Data"})).to.be.true;
+  });
+
+  it('check for user does not exist', () => {
+    const user_id=uuidv4();
+    const  req = mockRequest(mockTask,{user_id}) as Request;
+    const  res=mockResponse();
+    createTask(req as Request, res as Response);
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({status: "failure", message: "User Doesn't Exist"})).to.be.true;
+  });
+})
