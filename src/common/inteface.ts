@@ -19,3 +19,7 @@ export enum TaskStatus{
   INPROGRESS="In Progress", 
   DONE="Done"
 }
+export enum log {
+INFO="INFO",
+ERR="ERR"
+}

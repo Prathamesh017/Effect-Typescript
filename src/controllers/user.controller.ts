@@ -1,9 +1,9 @@
 
-import {Task, User} from "../common/inteface.ts";
+import {Task, User, log} from "../common/inteface.ts";
 import { Request, Response } from "express";
 import {createTaskService, createUserService,deleteTaskService,doesUserExist, getAllTasksService, updateTaskService } from "../services/user-service.ts";
 import { Effect, Exit } from "effect";
-import { isUUID } from "../common/utitlies.ts";
+import { isUUID,loggerFunc } from "../common/utitlies.ts";
 const users: User[] = [];
 const tasks:Task[]=[];
 
@@ -18,8 +18,8 @@ export function createUser(req: Request, res: Response){
     }else{
       res.status(400).json({ status: "failure", message: "User Already Exist" })
     }
-  } catch (err) {
-    console.log(err)
+  } catch (err:any) {
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 
@@ -47,8 +47,8 @@ export function createTask(req:Request,res:Response){
     }else{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
-  }catch(err){
-    console.log(err)
+  }catch(err:any){
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 }
@@ -69,8 +69,8 @@ export const getAllTasks=(req:Request,res:Response)=>{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
 
-  }catch(err){
-    console.log(err)
+  }catch(err:any){
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 }
@@ -98,8 +98,8 @@ export const getTask=(req:Request,res:Response)=>{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
 
-  }catch(err){
-    console.log(err)
+  }catch(err:any){
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 }
@@ -131,8 +131,8 @@ export function updateTask(req:Request,res:Response){
     }else{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
-  }catch(err){
-    console.log(err)
+  }catch(err:any){
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 }
@@ -159,8 +159,8 @@ export function deleteTask(req:Request,res:Response){
     }else{
       res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
     }
-  }catch(err){
-    console.log(err)
+  }catch(err:any){
+    loggerFunc(err.message,log.ERR) 
     res.status(400).json({ status: "Failure" })
   }
 }

@@ -1,10 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import userRouter from "./routes/routes.ts";
+import { Effect } from "effect";
+import { loggerFunc } from "./common/utitlies.ts";
+import {log} from "./common/inteface.ts"
 
 
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = process.env.POR || 3000;
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
@@ -12,5 +15,5 @@ app.get("/", (req: Request, res: Response) => {
 });
 app.use("/user",userRouter);
 app.listen(port,()=>{
-  console.log(`Server Listing on Port:${port}`);
+  loggerFunc(`Server Listing on Port:${port}`,log.INFO)
 })
