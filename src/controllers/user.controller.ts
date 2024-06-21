@@ -1,7 +1,7 @@
 
 import {User} from "../common/inteface.ts";
 import { Request, Response } from "express";
-import { doesUserExist } from "../services/user-service.ts";
+import {createUserService,doesUserExist } from "../services/user-service.ts";
 import { Effect, Exit } from "effect";
 const users: User[] = [];
 export function createUser(req: Request, res: Response){
@@ -13,10 +13,7 @@ export function createUser(req: Request, res: Response){
         res.status(400).json({ status: "failure", message: "User Already Exist" })
       },
       onSuccess: () => {
-        const user = {
-          id: users.length + 1,
-          user_name
-        }
+        const user = Effect.runSync(createUserService(user_name))
         users.push(user)
         res.status(200).json({ status: "Success", message: "User Created", data: user })
       }

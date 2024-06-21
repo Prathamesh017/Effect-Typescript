@@ -5,18 +5,18 @@ const chai = import('chai');
 describe("user service", () => {
   const mockUsers: User[] = [
     {
-      id: 1,
+      id: "1",
       user_name: "user 1"
     },
     {
-      id: 2,
+      id: "2",
       user_name: "user 2"
     }
   ]
 
   it("should return Success if user not exists before", async () => {
     const user = "user 3";
-    const exit = doesUserExist(user, mockUsers)
+    const exit = doesUserExist(user,mockUsers)
     const result = Effect.runSyncExit(exit);
     (await chai).expect(result._tag).to.equal('Success');
   })
