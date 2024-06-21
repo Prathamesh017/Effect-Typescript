@@ -45,3 +45,21 @@ export const getAllTasksService=(userId:string,taskId:string|null,tasks:Task[]):
   }
   return Effect.succeed(userTasks);
 }
+
+
+export const updateTaskService = (task_id:string,user_id: string,taskDetails:TaskRequest,tasks:Task[]): Effect.Effect<Task, Error> => {
+  const toUpdatedIndex=tasks.findIndex(task => task.user_id === user_id  && task_id===task.id );
+  if(toUpdatedIndex === -1){
+    return Effect.fail(new Error("Task Doesn't Exist"));
+  }
+  const  updatedTask: Task = {
+    title:taskDetails.title,
+    status:taskDetails.status,
+    id:task_id,
+    description:taskDetails.description,
+    dueDate:taskDetails.dueDate || Date.now(),
+    user_id,
+  }
+  tasks[toUpdatedIndex] = updatedTask;
+  return Effect.succeed(updatedTask);
+};

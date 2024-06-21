@@ -1,5 +1,5 @@
 import { Effect, Exit } from "effect";
-import { createTaskService, createUserService, doesUserExist, getAllTasksService } from "./user-service.ts";
+import { createTaskService, createUserService, doesUserExist, getAllTasksService, updateTaskService } from "./user-service.ts";
 import { Task, TaskStatus, User } from "../common/inteface.ts"
 import { createUser } from "../controllers/user.controller.ts";
 import { getUUIDPattern, isUUID } from "../common/utitlies.ts";
@@ -45,6 +45,7 @@ describe(("Task Service"), () => {
     { id: 'task3', title: 'Task 3', description: 'Description 3', status: TaskStatus.DONE, user_id: 'user1', dueDate: new Date(Date.now()) },
   ];
 
+  //! Create Tests
   it('should generate a task', async () => {
     const user_id = "1";
     const mockTask =
@@ -63,6 +64,7 @@ describe(("Task Service"), () => {
   });
 
 
+  //! GET ALL TASKS
   it('return all tasks for a given userId', async () => {
     const userId = 'user1';
     const result = Effect.runSync(getAllTasksService(userId, null, tasks));
@@ -77,7 +79,7 @@ describe(("Task Service"), () => {
     (await chai).expect(result.length).to.equals(0);
   });
 
-
+   //! GET A TASK
   it('return a particular task for a given userId and taskId', async () => {
     const userId = 'user1';
     const taskId = "task3";
@@ -97,4 +99,43 @@ describe(("Task Service"), () => {
       (await chai).expect(err).to.be.an('error').with.property('message', "Tasks Doesn't Exist");
     }
   });
+
+
+  // !  Update Task
+  it('should update the task successfully',async()=>{
+    const task_id = 'task1';
+    const user_id = 'user1';
+    const mockTask =
+    {
+      "title": "Task1",
+       id:task_id,
+       user_id:user_id,
+      "description": "Description",
+      "status": TaskStatus.DONE,
+      "dueDate": new Date(),
+    }
+    const result=Effect.runSync(updateTaskService(task_id,user_id,mockTask,tasks));
+    (await chai).expect(result.status).to.be.equal(mockTask.status);
+    (await chai).expect(tasks[0]).to.be.deep.equal(mockTask);
+
+  })
+  it('should fail if given task not found',async()=>{
+    const task_id = 'task4';
+    const user_id = 'user1';
+    const mockTask =
+    {
+      "title": "Task1",
+       id:task_id,
+       user_id:user_id,
+      "description": "Description",
+      "status": TaskStatus.DONE,
+      "dueDate": new Date(),
+    }
+    try {
+      Effect.runSyncExit(updateTaskService(task_id,user_id,mockTask,tasks));
+     }
+     catch (err) {
+       (await chai).expect(err).to.be.an('error').with.property('message', "Task Doesn't Exist");
+     }
+  })
 })
