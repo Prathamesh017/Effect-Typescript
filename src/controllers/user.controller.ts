@@ -74,3 +74,32 @@ export const getAllTasks=(req:Request,res:Response)=>{
     res.status(400).json({ status: "Failure" })
   }
 }
+
+
+export const getTask=(req:Request,res:Response)=>{
+  try{
+    const {user_id,task_id}=req.params;
+    if((!(isUUID(user_id))) || (!(isUUID(task_id)))){
+      res.status(400).json({status: "failure", message: "Invalid Id"})
+      return;
+    }
+    const isUserExist = Effect.runSync(doesUserExist("id",user_id, users));
+    if(isUserExist){
+      const taskExit= Effect.runSyncExit(getAllTasksService(user_id,task_id,tasks));
+      Exit.match(taskExit,{
+        onSuccess:(val)=>{
+          res.status(200).json({ status: "Success", message: "Task Retrieved Successfull", data: val})
+        },
+        onFailure:()=>{
+          res.status(400).json({ status: "failure", message: "Task Doesn't Exist" })
+        }
+      })
+    }else{
+      res.status(400).json({ status: "failure", message: "User Doesn't Exist" })
+    }
+
+  }catch(err){
+    console.log(err)
+    res.status(400).json({ status: "Failure" })
+  }
+}

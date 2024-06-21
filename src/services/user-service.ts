@@ -39,7 +39,7 @@ export const getAllTasksService=(userId:string,taskId:string|null,tasks:Task[]):
   if (taskId) {
     let task=userTasks.find(task => task.id === taskId);
     if(!task){
-      throw new Error("Tasks Doesn't Exist");
+      return Effect.fail(new Error("Tasks Doesn't Exist"));
     }
     return Effect.succeed([task]);
   }

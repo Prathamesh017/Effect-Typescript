@@ -1,7 +1,7 @@
 import { describe, it} from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { createTask, createUser, getAllTasks } from './user.controller.ts';
+import { createTask, createUser, getAllTasks, getTask } from './user.controller.ts';
 import { Request, Response } from 'express';import { Effect } from 'effect';
 import { isUUID } from '../common/utitlies.ts';
 import { TaskStatus } from '../common/inteface.ts';
@@ -102,5 +102,32 @@ describe("Task Get All Test Cases",()=>{
     expect(res.status.calledOnceWithExactly(400)).to.be.true;
     expect(res.json.calledOnceWithExactly({status: "failure", message: "User Doesn't Exist"})).to.be.true;
   });
+  
+})
+
+
+
+describe("Get a Task Test Cases",()=>{
+  
+  it('should return 400 if user_id  is invalid', () => {
+    const user_id='invalid-uuid';
+    const task_id=uuidv4();
+    const req = mockRequest(null,{user_id,task_id}) as Request;
+    const  res=mockResponse();
+    getTask(req as Request, res as Response);
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({ status: "failure", message: "Invalid Id"})).to.be.true;
+  });
+
+  it('should return error if user does not exist', () => {
+    const user_id=uuidv4();
+    const task_id=uuidv4();
+    const req = mockRequest(null,{user_id,task_id}) as Request;
+    const  res=mockResponse();
+    getTask(req as Request, res as Response);
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({status: "failure", message: "User Doesn't Exist"})).to.be.true;
+  });
+
   
 })
