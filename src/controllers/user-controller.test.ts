@@ -1,7 +1,7 @@
 import { describe, it} from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { createTask, createUser } from './user.controller.ts';
+import { createTask, createUser, getAllTasks } from './user.controller.ts';
 import { Request, Response } from 'express';import { Effect } from 'effect';
 import { isUUID } from '../common/utitlies.ts';
 import { TaskStatus } from '../common/inteface.ts';
@@ -43,14 +43,15 @@ describe('User-Controller Test Cases', () => {
 });
 
 
-describe("Task Controller Test Cases",()=>{
-  const mockTask=
-  { 
-    "title":"Task 2",
-    "description":"DESKTOP APP",
-    "status":TaskStatus.INPROGRESS,
-    "dueDate":new Date(),
-  }
+const mockTask=
+{ 
+  "title":"Task 2",
+  "description":"DESKTOP APP",
+  "status":TaskStatus.INPROGRESS,
+  "dueDate":new Date(),
+}
+describe("Task Create Test Cases",()=>{
+ 
   it('should return 400 if user_id is invalid', () => {
     const user_id='invalid-uuid';
     const req = mockRequest({mockTask},{user_id}) as Request;
@@ -78,4 +79,28 @@ describe("Task Controller Test Cases",()=>{
     expect(res.status.calledOnceWithExactly(400)).to.be.true;
     expect(res.json.calledOnceWithExactly({status: "failure", message: "User Doesn't Exist"})).to.be.true;
   });
+})
+
+
+describe("Task Get All Test Cases",()=>{
+  
+  it('should return 400 if user_id is invalid', () => {
+    const user_id='invalid-uuid';
+    const req = mockRequest({mockTask},{user_id}) as Request;
+    const  res=mockResponse();
+    getAllTasks(req as Request, res as Response);
+
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({ status: "failure", message: "Invalid User Id"})).to.be.true;
+  });
+
+  it('check for user does not exist', () => {
+    const user_id=uuidv4();
+    const  req = mockRequest(mockTask,{user_id}) as Request;
+    const  res=mockResponse();
+    getAllTasks(req as Request, res as Response);
+    expect(res.status.calledOnceWithExactly(400)).to.be.true;
+    expect(res.json.calledOnceWithExactly({status: "failure", message: "User Doesn't Exist"})).to.be.true;
+  });
+  
 })

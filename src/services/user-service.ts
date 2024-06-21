@@ -33,3 +33,15 @@ export const createTaskService = (user_id: string,taskDetails:TaskRequest): Effe
   }
   return Effect.succeed(task);
 };
+
+export const getAllTasksService=(userId:string,taskId:string|null,tasks:Task[]):Effect.Effect<Task[],Error>=>{
+  const userTasks=tasks.filter(task => task.user_id === userId);
+  if (taskId) {
+    let task=userTasks.find(task => task.id === taskId);
+    if(!task){
+      throw new Error("Tasks Doesn't Exist");
+    }
+    return Effect.succeed([task]);
+  }
+  return Effect.succeed(userTasks);
+}
